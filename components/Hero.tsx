@@ -1,6 +1,17 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+
 
 const Hero = () => {
+
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    fetch("/README.md")
+      .then(res => res.text())
+      .then(setContent);
+  }, []);
   const placeholderText = `src/
 ├─ components/
 │  └─ Header.tsx
@@ -140,8 +151,22 @@ package.json`;
           </div>
         </div>
       </div>
-      
-      <div className="">output</div>
+      {/* right output part */}
+      <div className="flex-1">
+        <div className="flex bg-gray-100 px-6 py-2 justify-between items-center text-sm">
+          <div className="bg-gray-200 py-2 px-3 flex gap-5 rounded-lg items-center">
+            <span className="bg-white text-blue-600 px-3 py-1 rounded-sm font-bold cursor-pointer">Preview</span>
+            <span className=" cursor-pointer">Raw Code</span>
+          </div>
+          <div className="flex gap-4">
+            <div className="flex items-center gap-1 bg-gray-200 border border-border-light text-xs font-bold  cursor-pointer transition-all border-[#e7ebf3] text-black px-3 py-1 rounded-lg"><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></span>Copy</div>
+            <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-lg text-sm cursor-pointer "><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></span>Download</div>
+          </div>
+        </div>
+        <div className="bg-white px-6 py-4">here the output should come
+          <ReactMarkdown>{content}</ReactMarkdown>
+        </div>
+      </div>
     </div>
   );
 };
