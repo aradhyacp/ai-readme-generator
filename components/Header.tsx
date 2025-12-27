@@ -1,35 +1,65 @@
-import React from "react";
+"use client";
+import { useTheme } from "next-themes";
+import { Moon, Sun, Github } from "lucide-react";
+import { Button } from "./ui/button";
+import Link from "next/link";
+import Typewriter from "typewriter-effect";
 
 const Header = () => {
+  const { theme, setTheme } = useTheme();
+
   return (
-    <div>
-      <div className="min-w-screen bg-white border-b-2 border-[#e7ebf3] flex justify-between px-7 py-4">
-        <div className="flex gap-3">
-          <div className="">Logo</div>
-          <div className="">Readme.ify</div>
-        </div>
-        <div className="flex gap-6 text-[#4e6797] items-center">
-          <button className="cursor-pointer">How it works</button>
-          <button className="cursor-pointer">Github Repo</button>
-          <button className="cursor-pointer">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              className="lucide lucide-moon-icon lucide-moon"
+    <header className="sticky top-0 z-50 w-full border-b bg-background/10 backdrop-blur-md">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
+        <Link className="flex items-center gap-3" href="/">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-8 w-8 text-primary"
+          >
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+          </svg>
+          <span className="text-xl font-bold tracking-tight">
+            <Typewriter
+              options={{ loop: true,deleteSpeed: 20, }}
+              onInit={(typewriter) => {
+                typewriter
+                  .typeString("Readme.ify")
+                  .pauseFor(2000)
+                  .deleteAll()
+                  .start();
+              }}
+            />
+          </span>
+        </Link>
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Button variant="ghost" size="sm" asChild className="hidden sm:flex">
+            <a
+              href="https://github.com/aradhyacp/ai-readme-generator/"
+              target="_blank"
+              rel="noreferrer"
             >
-              <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
-            </svg>
-          </button>
+              <Github className="mr-2 h-4 w-4" />
+              Github
+            </a>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            className="rounded-full"
+          >
+            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

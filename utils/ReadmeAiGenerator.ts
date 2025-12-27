@@ -1,6 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 
-const AiGen = async ({ apiKey, repoUrl, projectName, projectStruct, aboutProject }) => {
+interface AiGenParams {
+  apiKey: string;
+  repoUrl: string;
+  projectName: string;
+  projectStruct: string;
+  aboutProject: string;
+}
+
+const AiGen = async ({ apiKey, repoUrl, projectName, projectStruct, aboutProject }: AiGenParams) => {
       try {
         const ai = new GoogleGenAI({ apiKey:apiKey });
 
