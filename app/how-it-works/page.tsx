@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, easeOut, easeInOut } from "framer-motion"
 import {
   Github,
   Key,
@@ -100,7 +100,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: "easeOut",
+      ease: easeOut,
     },
   },
 }
@@ -112,7 +112,7 @@ const floatVariants = {
     transition: {
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut",
+      ease: easeInOut,
     },
   },
 }
