@@ -19,6 +19,33 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Readme.ify - AI README Generator",
   description: "Generate comprehensive README documentation for your projects using AI",
+  keywords: [
+    "README generator",
+    "AI documentation",
+    "project documentation",
+    "software README",
+    "documentation generator",
+  ],
+  openGraph: {
+    title: "Readme.ify - AI README Generator",
+    description: "Generate comprehensive README documentation for your projects using AI",
+    type: "website",
+    siteName: "Readme.ify",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Readme.ify - AI README Generator",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Readme.ify - AI README Generator",
+    description: "Generate comprehensive README documentation for your projects using AI",
+    images: ["/og-image.png"],
+  },
 }
 
 export default function RootLayout({
