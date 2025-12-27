@@ -1,17 +1,40 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
-
+import remarkGfm from "remark-gfm";
+import "github-markdown-css/github-markdown.css";
+import AiGen from "@/utils/ReadmeAiGenerator";
 
 const Hero = () => {
-
-  const [content, setContent] = useState("");
+  const [readMe, setReadMe] = useState("")
+  const [Preview, setPreview] = useState(true);
+  const [repoUrl, setrepoUrl] = useState("")
+  const [projectName, setProjectName]= useState("")
+  const [projectStruct, setprojectStruct] = useState("")
+  const [aiApiKey, setAiApiKey] = useState("")
+  const [apiKeyFromStorage, setApiKeyFromStorage] = useState(false);
 
   useEffect(() => {
-    fetch("/README.md")
-      .then(res => res.text())
-      .then(setContent);
-  }, []);
+  const savedKey = localStorage.getItem("GEMINI_API_KEY");
+
+  if (savedKey) {
+    setAiApiKey(savedKey);
+    setApiKeyFromStorage(true);
+  }
+}, []);
+
+
+  const handleGenReadMe = async () =>{
+    const content = await AiGen({
+      apiKey: aiApiKey,
+      repoUrl: repoUrl,
+      projectName: projectName,
+      projectStruct: projectStruct,
+      aboutProject: ""
+    });
+
+    setReadMe(content)
+  }
   const placeholderText = `src/
 ├─ components/
 │  └─ Header.tsx
@@ -19,9 +42,9 @@ const Hero = () => {
 │  └─ api.ts
 package.json`;
   return (
-    <div className="flex flex-row min-w-screen min-h-screen">
+    <div className="flex flex-row min-w-screen min-h-fit">
       {/* left input part */}
-      <div className="min-w-[35%] bg-[#f6f6f8]">
+      <div className="min-w-[35%] bg-[#f6f6f8] min-h-full">
         <div className="p-6 flex flex-col gap-8">
           <div className="">
             <div className="">Project Details</div>
@@ -51,6 +74,7 @@ package.json`;
               </svg>
               <input
                 type="text"
+                onChange={(e)=>setrepoUrl(e.target.value)}
                 placeholder="https://github.com/username/repo"
                 className="w-full rounded-lg border border-[#e7ebf3] bg-[#ffffff] px-4 py-3 pl-10 text-sm text-[#0e121b] placeholder:text-[#4e6797] shadow-sm transition-all focus:border-[#195de6] focus:ring-1 focus:ring-[#195de6] focus:outline-none"
               />
@@ -62,6 +86,7 @@ package.json`;
               type="text"
               className="bg-white w-full py-3 px-4 rounded-lg border-[#e7ebf3] text-sm transition-all shadow-sm"
               placeholder="Your project name"
+              onChange={(e)=>setProjectName(e.target.value)}
             />
           </div>
           <div className="flex gap-2 flex-col">
@@ -75,6 +100,7 @@ package.json`;
             <textarea
               className="form-textarea w-full px-4 py-3 rounded-lg text-sm font-mono h-40 resize-y bg-white border-[#e7ebf3]"
               placeholder={placeholderText}
+              onChange={(e)=>setprojectStruct(e.target.value)}
             />
           </div>
           <div className="">
@@ -98,11 +124,27 @@ package.json`;
               <input
                 type="text"
                 placeholder="sk-..."
-                className="bg-white w-full py-3 pl-12 pr-4 rounded-lg"
+                className={`bg-white w-full py-3 pl-12 pr-4 rounded-lg transition-all
+    ${
+      apiKeyFromStorage
+        ? "border-2 border-green-500 focus:ring-green-500"
+        : "border border-[#e7ebf3] focus:ring-[#195de6]"
+    }
+  `}
+                onChange={(e)=>{const value = e.target.value;
+  setAiApiKey(value);
+  localStorage.setItem("GEMINI_API_KEY", value);
+  setApiKeyFromStorage(false)}}
               />
             </div>
-            <div className="flex flex-row items-center gap-3 mt-2">
-              <span>
+            <div className="flex flex-col items-center gap-0.5 mt-2">
+              {apiKeyFromStorage ? (
+  <div className="flex items-center gap-1 mt-2 text-sm text-green-600">
+    <span>✅</span>
+    <span>Safely fetched API key from localStorage</span>
+  </div>
+):<div className="text-sm flex flex-row items-center">
+                 <span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="14"
@@ -120,13 +162,12 @@ package.json`;
                   <path d="M7 10V7a5 5 0 0 1 10 0v3" />
                 </svg>
               </span>
-              <div className="text-sm">
                 Key is stored locally in your browser.
-              </div>
+              </div>}
             </div>
           </div>
           <div className="">
-            <button className="w-full flex items-center justify-center gap-2 bg-[#195de6] hover:bg-[#195de6de] text-white font-bold py-3.5 px-6 rounded-lg shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
+            <button className="w-full flex items-center justify-center gap-2 bg-[#195de6] hover:bg-[#195de6de] text-white font-bold py-3.5 px-6 rounded-lg shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer" onClick={handleGenReadMe}>
               <span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -154,17 +195,82 @@ package.json`;
       {/* right output part */}
       <div className="flex-1">
         <div className="flex bg-gray-100 px-6 py-2 justify-between items-center text-sm">
-          <div className="bg-gray-200 py-2 px-3 flex gap-5 rounded-lg items-center">
-            <span className="bg-white text-blue-600 px-3 py-1 rounded-sm font-bold cursor-pointer">Preview</span>
-            <span className=" cursor-pointer">Raw Code</span>
+          <div className="bg-gray-200 py-2 px-3 flex gap-2 rounded-lg items-center">
+            <span
+              className={`cursor-pointer px-3 py-1 rounded-sm font-bold transition-colors duration-300 ${
+                Preview ? "bg-white text-blue-600" : "bg-gray-200 text-gray-600"
+              }`}
+              onClick={() => setPreview(true)}
+            >
+              Preview
+            </span>
+
+            <span
+              className={`cursor-pointer px-3 py-1 rounded-sm font-bold transition-colors duration-300 ${
+                !Preview
+                  ? "bg-white text-blue-600"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+              onClick={() => setPreview(false)}
+            >
+              Raw Code
+            </span>
           </div>
+
           <div className="flex gap-4">
-            <div className="flex items-center gap-1 bg-gray-200 border border-border-light text-xs font-bold  cursor-pointer transition-all border-[#e7ebf3] text-black px-3 py-1 rounded-lg"><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></span>Copy</div>
-            <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-lg text-sm cursor-pointer "><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></span>Download</div>
+            <div className="flex items-center gap-1 bg-gray-200 border border-border-light text-xs font-bold  cursor-pointer transition-all border-[#e7ebf3] text-black px-3 py-1 rounded-lg">
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-copy-icon lucide-copy"
+                >
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                </svg>
+              </span>
+              Copy
+            </div>
+            <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-lg text-sm cursor-pointer ">
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-download-icon lucide-download"
+                >
+                  <path d="M12 15V3" />
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <path d="m7 10 5 5 5-5" />
+                </svg>
+              </span>
+              Download
+            </div>
           </div>
         </div>
-        <div className="bg-white px-6 py-4">here the output should come
-          <ReactMarkdown>{content}</ReactMarkdown>
+        <div className="bg-white px-6 py-4">
+          {Preview ? (
+            <div className="bg-white markdown-body">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {readMe}
+              </ReactMarkdown>
+            </div>
+          ) : (
+            <div className="">{readMe}</div>
+          )}
         </div>
       </div>
     </div>
