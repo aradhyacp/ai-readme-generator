@@ -100,10 +100,12 @@ const Hero = () => {
   const downloadReadme = () => {
     const element = document.createElement("a")
     const file = new Blob([readMe], { type: "text/plain" })
-    element.href = URL.createObjectURL(file)
+    const url = URL.createObjectURL(file)
+    element.href = url
     element.download = "README.md"
     document.body.appendChild(element)
     element.click()
+    URL.revokeObjectURL(url)
     document.body.removeChild(element)
   }
 
