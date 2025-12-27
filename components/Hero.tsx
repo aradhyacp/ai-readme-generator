@@ -311,7 +311,7 @@ const Hero = () => {
                       <div className="space-y-2">
                         <h3 className="text-lg font-semibold">No README Generated</h3>
                         <p className="text-sm text-muted-foreground">
-                          Fill in your project details on the left and click &quot;Generate README&quot; to get started.
+                          Fill in your project details on the left and click "Generate README" to get started.
                         </p>
                       </div>
                     </div>
