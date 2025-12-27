@@ -6,35 +6,40 @@ import "github-markdown-css/github-markdown.css";
 import AiGen from "@/utils/ReadmeAiGenerator";
 
 const Hero = () => {
-  const [readMe, setReadMe] = useState("")
+  const [readMe, setReadMe] = useState("");
   const [Preview, setPreview] = useState(true);
-  const [repoUrl, setrepoUrl] = useState("")
-  const [projectName, setProjectName]= useState("")
-  const [projectStruct, setprojectStruct] = useState("")
-  const [aiApiKey, setAiApiKey] = useState("")
+  const [repoUrl, setrepoUrl] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [projectStruct, setprojectStruct] = useState("");
+  const [aiApiKey, setAiApiKey] = useState("");
   const [apiKeyFromStorage, setApiKeyFromStorage] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-  const savedKey = localStorage.getItem("GEMINI_API_KEY");
+    const savedKey = localStorage.getItem("GEMINI_API_KEY");
 
-  if (savedKey) {
-    setAiApiKey(savedKey);
-    setApiKeyFromStorage(true);
-  }
-}, []);
+    if (savedKey) {
+      setAiApiKey(savedKey);
+      setApiKeyFromStorage(true);
+    }
+  }, []);
 
-
-  const handleGenReadMe = async () =>{
-    const content = await AiGen({
-      apiKey: aiApiKey,
-      repoUrl: repoUrl,
-      projectName: projectName,
-      projectStruct: projectStruct,
-      aboutProject: ""
-    });
-
-    setReadMe(content)
-  }
+  const handleGenReadMe = async () => {
+    setLoading(true);
+    try {
+      const content = await AiGen({
+        apiKey: aiApiKey,
+        repoUrl: repoUrl,
+        projectName: projectName,
+        projectStruct: projectStruct,
+        aboutProject: "",
+      });
+      setReadMe(content);
+    } catch {
+    } finally {
+      setLoading(false);
+    }
+  };
   const placeholderText = `src/
 ├─ components/
 │  └─ Header.tsx
@@ -74,7 +79,7 @@ package.json`;
               </svg>
               <input
                 type="text"
-                onChange={(e)=>setrepoUrl(e.target.value)}
+                onChange={(e) => setrepoUrl(e.target.value)}
                 placeholder="https://github.com/username/repo"
                 className="w-full rounded-lg border border-[#e7ebf3] bg-[#ffffff] px-4 py-3 pl-10 text-sm text-[#0e121b] placeholder:text-[#4e6797] shadow-sm transition-all focus:border-[#195de6] focus:ring-1 focus:ring-[#195de6] focus:outline-none"
               />
@@ -86,7 +91,7 @@ package.json`;
               type="text"
               className="bg-white w-full py-3 px-4 rounded-lg border-[#e7ebf3] text-sm transition-all shadow-sm"
               placeholder="Your project name"
-              onChange={(e)=>setProjectName(e.target.value)}
+              onChange={(e) => setProjectName(e.target.value)}
             />
           </div>
           <div className="flex gap-2 flex-col">
@@ -100,7 +105,7 @@ package.json`;
             <textarea
               className="form-textarea w-full px-4 py-3 rounded-lg text-sm font-mono h-40 resize-y bg-white border-[#e7ebf3]"
               placeholder={placeholderText}
-              onChange={(e)=>setprojectStruct(e.target.value)}
+              onChange={(e) => setprojectStruct(e.target.value)}
             />
           </div>
           <div className="">
@@ -123,7 +128,7 @@ package.json`;
               </svg>
               <input
                 type="text"
-                placeholder="sk-..."
+                placeholder="AI....."
                 className={`bg-white w-full py-3 pl-12 pr-4 rounded-lg transition-all
     ${
       apiKeyFromStorage
@@ -131,62 +136,92 @@ package.json`;
         : "border border-[#e7ebf3] focus:ring-[#195de6]"
     }
   `}
-                onChange={(e)=>{const value = e.target.value;
-  setAiApiKey(value);
-  localStorage.setItem("GEMINI_API_KEY", value);
-  setApiKeyFromStorage(false)}}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setAiApiKey(value);
+                  localStorage.setItem("GEMINI_API_KEY", value);
+                  setApiKeyFromStorage(false);
+                }}
               />
             </div>
             <div className="flex flex-col items-center gap-0.5 mt-2">
               {apiKeyFromStorage ? (
-  <div className="flex items-center gap-1 mt-2 text-sm text-green-600">
-    <span>✅</span>
-    <span>Safely fetched API key from localStorage</span>
-  </div>
-):<div className="text-sm flex flex-row items-center">
-                 <span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  className="lucide lucide-lock-keyhole-icon lucide-lock-keyhole"
-                >
-                  <circle cx="12" cy="16" r="1" />
-                  <rect x="3" y="10" width="18" height="12" rx="2" />
-                  <path d="M7 10V7a5 5 0 0 1 10 0v3" />
-                </svg>
-              </span>
-                Key is stored locally in your browser.
-              </div>}
+                <div className="flex items-center gap-1 mt-2 text-sm text-green-600">
+                  <span>✅</span>
+                  <span>Safely fetched API key from localStorage</span>
+                </div>
+              ) : (
+                <div className="text-sm flex flex-row items-center">
+                  <span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      className="lucide lucide-lock-keyhole-icon lucide-lock-keyhole"
+                    >
+                      <circle cx="12" cy="16" r="1" />
+                      <rect x="3" y="10" width="18" height="12" rx="2" />
+                      <path d="M7 10V7a5 5 0 0 1 10 0v3" />
+                    </svg>
+                  </span>
+                  Key is stored locally in your browser.
+                </div>
+              )}
             </div>
           </div>
           <div className="">
-            <button className="w-full flex items-center justify-center gap-2 bg-[#195de6] hover:bg-[#195de6de] text-white font-bold py-3.5 px-6 rounded-lg shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer" onClick={handleGenReadMe}>
-              <span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  className="lucide lucide-sparkles-icon lucide-sparkles"
-                >
-                  <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
-                  <path d="M20 2v4" />
-                  <path d="M22 4h-4" />
-                  <circle cx="4" cy="20" r="2" />
-                </svg>
-              </span>
+            <button
+              className={`w-full flex items-center justify-center gap-2 font-bold py-3.5 px-6 rounded-lg shadow-lg shadow-primary/20 transition-all ${
+                loading
+                  ? "bg-[#6d91d9] text-gray-100 cursor-not-allowed"
+                  : "bg-[#195de6] text-white hover:bg-[#195de6de] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              }`}
+              onClick={handleGenReadMe}
+            >
+              {loading ? (
+                <span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-loader-circle-icon lucide-loader-circle animate-spin"
+                  >
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                </span>
+              ) : (
+                <span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    className="lucide lucide-sparkles-icon lucide-sparkles"
+                  >
+                    <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
+                    <path d="M20 2v4" />
+                    <path d="M22 4h-4" />
+                    <circle cx="4" cy="20" r="2" />
+                  </svg>
+                </span>
+              )}
               Generate README
             </button>
           </div>
