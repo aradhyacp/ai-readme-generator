@@ -1,15 +1,17 @@
-"use client"
-import { useTheme } from "next-themes"
-import { Moon, Sun, Github } from "lucide-react"
-import { Button } from "./ui/button"
+"use client";
+import { useTheme } from "next-themes";
+import { Moon, Sun, Github } from "lucide-react";
+import { Button } from "./ui/button";
+import Link from "next/link";
+import Typewriter from "typewriter-effect";
 
 const Header = () => {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/10 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
-        <div className="flex items-center gap-3">
+        <Link className="flex items-center gap-3" href="/">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -21,11 +23,26 @@ const Header = () => {
           >
             <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
           </svg>
-          <span className="text-xl font-bold tracking-tight">Readme.ify</span>
-        </div>
+          <span className="text-xl font-bold tracking-tight">
+            <Typewriter
+              options={{ loop: true,deleteSpeed: 20, }}
+              onInit={(typewriter) => {
+                typewriter
+                  .typeString("Readme.ify")
+                  .pauseFor(2000)
+                  .deleteAll()
+                  .start();
+              }}
+            />
+          </span>
+        </Link>
         <div className="flex items-center gap-2 sm:gap-4">
           <Button variant="ghost" size="sm" asChild className="hidden sm:flex">
-            <a href="https://github.com/aradhyacp/ai-readme-generator/" target="_blank" rel="noreferrer">
+            <a
+              href="https://github.com/aradhyacp/ai-readme-generator/"
+              target="_blank"
+              rel="noreferrer"
+            >
               <Github className="mr-2 h-4 w-4" />
               Github
             </a>
@@ -43,7 +60,7 @@ const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
