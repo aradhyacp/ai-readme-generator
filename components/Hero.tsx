@@ -1,13 +1,13 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
-import rehypeRaw from "rehype-raw"
+import {Streamdown } from "streamdown"
+import { code, createCodePlugin } from '@streamdown/code';
 import { motion, AnimatePresence } from "framer-motion"
 import Toastify from "toastify-js"
 import "toastify-js/src/toastify.css"
 import "github-markdown-css/github-markdown.css";
+import "streamdown/styles.css";
 import {
   Sparkles,
   Copy,
@@ -38,6 +38,7 @@ const Hero = () => {
   const [aiApiKey, setAiApiKey] = useState("")
   const [apiKeyFromStorage, setApiKeyFromStorage] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [streamStatus, setStreamStatus] = useState<"idle" | "streaming" | "done" | "error">("idle")
 
   const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
     const backgrounds = {
@@ -73,7 +74,11 @@ const Hero = () => {
       showToast("Please provide a Gemini API key to generate the README.", "error")
       return
     }
+
+    setReadMe("")
+    setStreamStatus("streaming")
     setLoading(true)
+
     try {
       const content = await AiGen({
         apiKey: aiApiKey,
@@ -81,11 +86,17 @@ const Hero = () => {
         projectName: projectName,
         projectStruct: projectStruct,
         aboutProject: "",
+        onChunk: (chunkText) => {
+          setReadMe((prev) => prev + chunkText)
+        },
       })
+
       setReadMe(content)
+      setStreamStatus("done")
       showToast("README Generated! Your documentation is ready.", "success")
     } catch (error) {
       console.error("[v0] Generation error:", error)
+      setStreamStatus("error")
       showToast("An error occurred while generating your README.", "error")
     } finally {
       setLoading(false)
@@ -108,6 +119,10 @@ const Hero = () => {
     URL.revokeObjectURL(url)
     document.body.removeChild(element)
   }
+
+  const code = createCodePlugin({
+    themes: ["github-dark","github-dark"]
+  })
 
   return (
     <div className="container mx-auto min-h-[calc(100vh-4rem)] p-4 py-8 sm:px-8">
@@ -182,7 +197,7 @@ const Hero = () => {
               <Button
                 onClick={handleGenReadMe}
                 disabled={loading}
-                className="w-full h-11 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full h-11 text-base font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                 Generate README
@@ -222,7 +237,7 @@ const Hero = () => {
 
             <CardContent className="flex-1 overflow-auto p-0">
               <AnimatePresence mode="wait">
-                {loading ? (
+                {loading && !readMe ? (
                   <motion.div
                     key="skeleton"
                     initial={{ opacity: 0 }}
@@ -295,8 +310,8 @@ const Hero = () => {
                     className="p-6 sm:p-8"
                   >
                     {view === "preview" ? (
-                      <div className="prose prose-sm dark:prose-invert max-w-none markdown-body">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{readMe}</ReactMarkdown>
+                      <div className="max-w-none">
+                        <Streamdown plugins={{code}} mode="streaming" animated={{duration: 250}} isAnimating={streamStatus === "streaming"} caret="block" shikiTheme={["github-dark", "github-dark"]}>{readMe}</Streamdown>
                       </div>
                     ) : (
                       <pre className="rounded-lg bg-muted p-4 font-mono text-sm overflow-x-auto">
