@@ -11,16 +11,13 @@
 
 This frontend-only app streams AI responses in real-time, rendering beautifully animated Markdown content as it arrives, letting you see your README take shape instantly while the AI writes.
 
----
-## 🚀 What Makes This Project Special?
-
 ### 🎥 **Real-Time Streaming with Streamdown**
 
 Experience your README being written **live**, as the AI streams content chunk-by-chunk. Powered by [Streamdown](https://streamdown.ai/), your markdown renders smoothly with beautiful animated transitions, syntax-highlighted code blocks, and interactive copy buttons — all updating instantly without page reloads.
 
 ## 🚀 Key Features
 
-- **Streamed Markdown Rendering**: Uses [Streamdown](https://streamdown.dev/) to animate the streaming AI output for a smooth, live content reveal.
+- **Streamed Markdown Rendering**: Uses [Streamdown](https://streamdown.ai/) to animate the streaming AI output for a smooth, live content reveal.
 - **Your API Key, Your Data**: Fully frontend—uses your own AI API key without backend servers.
 - **✨ AI-Powered Generation**: Custom `ReadmeAiGenerator` utility transforms your project inputs into well-structured README content on the fly.
 - **🎨 Modern UI/UX**: Built with **Shadcn UI** + **Tailwind CSS** for a sleek, responsive design.
@@ -52,16 +49,6 @@ Experience your README being written **live**, as the AI streams content chunk-b
 ### Tools & Utilities
 - **ESLint** & **PostCSS** — Code quality and CSS transformations
 - **Custom React hooks** — For notifications and state management
-
----
-
-## 📸 Screenshots
-
-| Live Streaming Preview | Interactive Editor |
-| :---: | :---: |
-| ![Live streaming README generation](https://via.placeholder.com/800x450?text=Live+Streaming+Preview) | ![Editor Interface](https://via.placeholder.com/800x450?text=Editor+Interface) |
-
-> *Replace these placeholders with actual screenshots from your app.*
 
 ---
 
