@@ -6,9 +6,10 @@ interface AiGenParams {
   projectName: string;
   projectStruct: string;
   aboutProject: string;
+  onChunk?: (chunkText: string) => void;
 }
 
-const AiGen = async ({ apiKey, repoUrl, projectName, projectStruct, aboutProject }: AiGenParams) => {
+const AiGen = async ({ apiKey, repoUrl, projectName, projectStruct, aboutProject, onChunk }: AiGenParams) => {
       try {
         const ai = new GoogleGenAI({ apiKey:apiKey });
 
@@ -55,18 +56,25 @@ Ensure the README is well-formatted with Markdown, including headings, subheadin
         const model = "gemini-3-flash-preview";
         
 
-        const response = await ai.models.generateContent({
+        const response = await ai.models.generateContentStream({
           model,
           contents: prompt,
         });
 
-        return (
-      response?.text ||
-      "No content generated"
-    );
+        let fullText = "";
+
+        for await (const chunk of response) {
+          const chunkText = chunk.text ?? "";
+          if (chunkText) {
+            fullText += chunkText;
+            onChunk?.(chunkText);
+          }
+        }
+
+        return fullText || "No content generated";
       } catch (error) {
         console.error("Error generating AI content:", error);
-        return "Error generating README";
+        throw error instanceof Error ? error : new Error("Error generating README");
       }
 };
 
